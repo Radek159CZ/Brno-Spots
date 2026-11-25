@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -36,21 +37,53 @@ const tiles = MAPY_API_KEY
         '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
     }
 
-export default function MapView({ places }) {
+// Leaflet measures its container only once. When the sidebar slides away the
+// map gets wider, so we watch its size and tell Leaflet to re-measure –
+// otherwise a grey strip without tiles appears.
+function ResizeHandler() {
+  const map = useMap()
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => map.invalidateSize())
+    observer.observe(map.getContainer())
+    return () => observer.disconnect()
+  }, [map])
+
+  return null
+}
+
+// Smoothly moves the map to the selected place whenever the selection changes.
+function FlyToSelected({ place }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (place) {
+      map.flyTo([place.lat, place.lng], Math.max(map.getZoom(), 16))
+    }
+  }, [map, place])
+
+  return null
+}
+
+export default function MapView({ places, selectedPlace, onSelectPlace }) {
   return (
     <MapContainer center={BRNO_CENTER} zoom={DEFAULT_ZOOM} className="map">
       <TileLayer url={tiles.url} attribution={tiles.attribution} />
+      <ResizeHandler />
+      <FlyToSelected place={selectedPlace} />
 
-      {places.map((place) => (
-        <Marker key={place.id} position={[place.lat, place.lng]}>
-          <Popup>
-            <h3 className="popup-title">{place.name}</h3>
-            <p className="popup-meta">
-              {place.category} · {'★'.repeat(place.rating)}
-            </p>
-          </Popup>
-        </Marker>
-      ))}
+      {places.map((place) => {
+        const isDimmed = selectedPlace && selectedPlace.id !== place.id
+        return (
+          <Marker
+            key={place.id}
+            position={[place.lat, place.lng]}
+            title={place.name}
+            opacity={isDimmed ? 0.5 : 1}
+            eventHandlers={{ click: () => onSelectPlace(place.id) }}
+          />
+        )
+      })}
     </MapContainer>
   )
 }

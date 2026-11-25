@@ -41,6 +41,11 @@ Open http://localhost:5173.
 Without an API key, the map falls back to OpenStreetMap tiles, so the app
 works out of the box.
 
+## Credits
+
+Sample photos are from Wikimedia Commons under CC BY-SA licences – see
+[frontend/public/photos/CREDITS.md](frontend/public/photos/CREDITS.md).
+
 ## Roadmap
 
 - [x] Map of Brno with sample pins
