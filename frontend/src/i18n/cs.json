@@ -1,0 +1,37 @@
+{
+  "language.label": "Jazyk",
+
+  "view.label": "Zobrazení",
+  "view.list": "Seznam",
+  "view.map": "Mapa",
+
+  "search.placeholder": "Hledat podle názvu",
+  "search.label": "Hledat místa podle názvu",
+  "addPlace": "+ Přidat místo",
+
+  "categories.label": "Kategorie",
+  "category.All": "Vše",
+  "category.Viewpoint": "Vyhlídka",
+  "category.Sightseeing": "Památka",
+  "category.Market": "Trh",
+  "category.Park": "Park",
+
+  "results.count": { "one": "{count} místo", "few": "{count} místa", "other": "{count} míst" },
+  "results.for": "pro:",
+  "results.clearAll": "Zrušit vše",
+  "results.removeFilter": "Odebrat filtr {label}",
+
+  "sort.label": "Řadit podle",
+  "sort.rating": "hodnocení",
+  "sort.name": "názvu (A–Z)",
+
+  "grid.empty": "Filtrům neodpovídá žádné místo.",
+
+  "panel.title": "Objevuj Brno",
+
+  "detail.close": "Zpět na seznam",
+  "detail.myTips": "Moje tipy",
+  "detail.skip": "Radši vynech",
+  "detail.website": "Web a program",
+  "detail.navigate": "Navigovat"
+}

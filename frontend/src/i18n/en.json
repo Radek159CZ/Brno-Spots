@@ -1,0 +1,37 @@
+{
+  "language.label": "Language",
+
+  "view.label": "View",
+  "view.list": "List",
+  "view.map": "Map",
+
+  "search.placeholder": "Search by name",
+  "search.label": "Search places by name",
+  "addPlace": "+ Add place",
+
+  "categories.label": "Categories",
+  "category.All": "All",
+  "category.Viewpoint": "Viewpoint",
+  "category.Sightseeing": "Sightseeing",
+  "category.Market": "Market",
+  "category.Park": "Park",
+
+  "results.count": { "one": "{count} place", "other": "{count} places" },
+  "results.for": "for:",
+  "results.clearAll": "Clear all",
+  "results.removeFilter": "Remove filter {label}",
+
+  "sort.label": "Sort by",
+  "sort.rating": "Rating",
+  "sort.name": "Name (A–Z)",
+
+  "grid.empty": "No places match your filters.",
+
+  "panel.title": "Discover Brno",
+
+  "detail.close": "Back to list",
+  "detail.myTips": "My tips",
+  "detail.skip": "Better skip",
+  "detail.website": "Website & events",
+  "detail.navigate": "Navigate"
+}

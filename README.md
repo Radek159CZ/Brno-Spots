@@ -49,10 +49,12 @@ Sample photos are from Wikimedia Commons under CC BY-SA licences – see
 ## Roadmap
 
 - [x] Map of Brno with sample pins
+- [x] List / map views, category filter, search, sorting
+- [x] Place detail (description, photo, rating, tips)
+- [x] "Navigate" button → Mapy.com route
+- [x] Czech / English UI
 - [ ] REST API + database for places
-- [ ] Category filter
-- [ ] Place detail (description, photos, rating, tips)
 - [ ] Create / edit / delete places (single owner)
-- [ ] "Navigate" button → Mapy.com route
+- [ ] Events / opening hours from external sources
 - [ ] Stage 2: menu items with prices and "last updated" date
 - [ ] Stage 3: public transport info, multiple users
