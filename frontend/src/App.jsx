@@ -6,12 +6,14 @@ import PlaceGrid from './components/PlaceGrid.jsx'
 import MapView from './components/MapView.jsx'
 import PlaceDetail from './components/PlaceDetail.jsx'
 import PlaceListPanel from './components/PlaceListPanel.jsx'
-import { samplePlaces } from './data/samplePlaces.js'
+import LoadStatus from './components/LoadStatus.jsx'
 import { filterAndSortPlaces, getCategories } from './lib/places.js'
-
-const categories = getCategories(samplePlaces)
+import { usePlaces } from './lib/usePlaces.js'
 
 export default function App() {
+  // --- Data from the API ---
+  const { places, status, reload } = usePlaces()
+
   // --- State: the minimum the app needs to remember ---
   const [view, setView] = useState('map') // 'map' | 'list'
   const [category, setCategory] = useState('All')
@@ -22,8 +24,11 @@ export default function App() {
   const [selectedPlaceId, setSelectedPlaceId] = useState(null)
 
   // --- Derived values: computed from state on every render ---
-  const visiblePlaces = filterAndSortPlaces(samplePlaces, { category, query, sortBy })
-  const selectedPlace = samplePlaces.find((place) => place.id === selectedPlaceId)
+  const categories = getCategories(places)
+  const visiblePlaces = filterAndSortPlaces(places, { category, query, sortBy })
+  // Looked up among the *visible* places: when a filter hides the selected
+  // place, its detail closes too (instead of showing a place with no pin).
+  const selectedPlace = visiblePlaces.find((place) => place.id === selectedPlaceId)
 
   function selectPlace(id) {
     setSelectedPlaceId(id)
@@ -45,7 +50,12 @@ export default function App() {
       />
 
       <main className="content">
-        {view === 'list' && <PlaceGrid places={visiblePlaces} onSelectPlace={selectPlace} />}
+        {view === 'list' &&
+          (status === 'ready' ? (
+            <PlaceGrid places={visiblePlaces} onSelectPlace={selectPlace} />
+          ) : (
+            <LoadStatus status={status} onRetry={reload} />
+          ))}
 
         {/* The map stays mounted (only hidden) so it keeps its zoom and position
             when you switch to the list and back. */}
@@ -53,11 +63,16 @@ export default function App() {
           <MapView
             places={visiblePlaces}
             selectedPlace={selectedPlace}
+            isVisible={view === 'map'}
             onSelectPlace={selectPlace}
             onBackgroundClick={() => setSelectedPlaceId(null)}
           />
-          {/* One floating panel: the detail of the selected place, or the list. */}
-          {selectedPlace ? (
+          {/* One floating panel: loading/error, the detail of the selected place, or the list. */}
+          {status !== 'ready' ? (
+            <section className="map-panel">
+              <LoadStatus status={status} onRetry={reload} />
+            </section>
+          ) : selectedPlace ? (
             <PlaceDetail place={selectedPlace} onClose={() => setSelectedPlaceId(null)} />
           ) : (
             <PlaceListPanel places={visiblePlaces} onSelectPlace={selectPlace} />

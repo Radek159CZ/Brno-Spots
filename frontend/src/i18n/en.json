@@ -13,7 +13,10 @@
   "category.All": "All",
   "category.Viewpoint": "Viewpoint",
   "category.Sightseeing": "Sightseeing",
-  "category.Market": "Market",
+  "category.Cafe": "Café",
+  "category.Restaurant": "Restaurant",
+  "category.Pub": "Pub",
+  "category.Cinema": "Cinema",
   "category.Park": "Park",
 
   "results.count": { "one": "{count} place", "other": "{count} places" },
@@ -24,6 +27,10 @@
   "sort.label": "Sort by",
   "sort.rating": "Rating",
   "sort.name": "Name (A–Z)",
+
+  "load.loading": "Loading places…",
+  "load.error": "Couldn’t load the places. Is the backend running?",
+  "load.retry": "Try again",
 
   "grid.empty": "No places match your filters.",
 

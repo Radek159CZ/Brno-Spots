@@ -13,7 +13,10 @@
   "category.All": "Vše",
   "category.Viewpoint": "Vyhlídka",
   "category.Sightseeing": "Památka",
-  "category.Market": "Trh",
+  "category.Cafe": "Kavárna",
+  "category.Restaurant": "Restaurace",
+  "category.Pub": "Hospoda",
+  "category.Cinema": "Kino",
   "category.Park": "Park",
 
   "results.count": { "one": "{count} místo", "few": "{count} místa", "other": "{count} míst" },
@@ -24,6 +27,10 @@
   "sort.label": "Řadit podle",
   "sort.rating": "hodnocení",
   "sort.name": "názvu (A–Z)",
+
+  "load.loading": "Načítám místa…",
+  "load.error": "Místa se nepodařilo načíst. Běží backend?",
+  "load.retry": "Zkusit znovu",
 
   "grid.empty": "Filtrům neodpovídá žádné místo.",
 

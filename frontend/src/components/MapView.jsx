@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, ZoomControl, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -79,17 +79,23 @@ function ResizeHandler() {
 
 // Zooms the map so all visible places fit next to the panel.
 // Runs on start and whenever the set of places changes (e.g. a filter).
-function FitToPlaces({ places }) {
+// While the map is hidden (list view) it has zero size and fitting would put
+// it in a wrong spot – so it waits and fits once the map is shown again.
+function FitToPlaces({ places, isVisible }) {
   const map = useMap()
   // useRef = a value that survives re-renders but changing it doesn't re-render.
   const isFirstFit = useRef(true)
+  const lastFitted = useRef(null)
   // A string like "49.19,16.59;49.20,16.60". It changes only when different
   // places are shown – the `places` array itself is new on every render,
   // so depending on it would re-zoom the map all the time.
   const coordinates = places.map((place) => `${place.lat},${place.lng}`).join(';')
 
   useEffect(() => {
-    if (coordinates === '') return
+    // Hidden, nothing to show, or already fitted to these places (just
+    // switching back from the list keeps the user's own zoom and position).
+    if (!isVisible || coordinates === '' || coordinates === lastFitted.current) return
+    lastFitted.current = coordinates
     map.invalidateSize() // make sure Leaflet knows the real size before fitting
     const points = coordinates.split(';').map((pair) => pair.split(',').map(Number))
     const covered = getCoveredArea(map)
@@ -100,7 +106,7 @@ function FitToPlaces({ places }) {
       animate: !isFirstFit.current, // instant on page load, animated after a filter change
     })
     isFirstFit.current = false
-  }, [map, coordinates])
+  }, [map, coordinates, isVisible])
 
   return null
 }
@@ -112,6 +118,9 @@ function FlyToSelected({ place }) {
 
   useEffect(() => {
     if (!place) return
+    // The map may have just been shown (a card clicked in the list view) and
+    // Leaflet still remembers its hidden, zero size – measure it again first.
+    map.invalidateSize()
     const zoom = Math.max(map.getZoom(), 16)
     const covered = getCoveredArea(map)
     // Work in pixels: move the centre left/down by half the covered area.
@@ -176,10 +185,38 @@ function BackgroundClickHandler({ onClick }) {
   return null
 }
 
-export default function MapView({ places, selectedPlace, onSelectPlace, onBackgroundClick }) {
+// One pin. The icon is created again only when what it shows changes.
+// A new icon makes Leaflet rebuild the pin's HTML, which would throw away
+// the label hiding done by LabelCollisionHandler (e.g. on a language switch).
+function PlaceMarker({ place, isSelected, onSelect }) {
+  const { id, name, rating } = place
+  const icon = useMemo(
+    () => createPinIcon({ name, rating }, isSelected),
+    [name, rating, isSelected],
+  )
+
+  return (
+    <Marker
+      position={[place.lat, place.lng]}
+      icon={icon}
+      title={name}
+      riseOnHover
+      zIndexOffset={isSelected ? 1000 : 0}
+      eventHandlers={{ click: () => onSelect(id) }}
+    />
+  )
+}
+
+export default function MapView({
+  places,
+  selectedPlace,
+  isVisible,
+  onSelectPlace,
+  onBackgroundClick,
+}) {
   const { lang } = useI18n()
   const tiles = getTiles(lang)
-  const labelTrigger = `${places.map((place) => place.id).join(',')}|${selectedPlace?.id}`
+  const labelTrigger = `${places.map((place) => place.id).join(',')}|${selectedPlace?.id}|${isVisible}`
 
   return (
     <MapContainer center={BRNO_CENTER} zoom={DEFAULT_ZOOM} zoomControl={false} className="map">
@@ -187,24 +224,18 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onBackgr
       {/* Bottom right, so the panel on the left doesn't cover it. */}
       <ZoomControl position="bottomright" />
       <ResizeHandler />
-      <FitToPlaces places={places} />
+      <FitToPlaces places={places} isVisible={isVisible} />
       <FlyToSelected place={selectedPlace} />
       <BackgroundClickHandler onClick={onBackgroundClick} />
 
-      {places.map((place) => {
-        const isSelected = selectedPlace?.id === place.id
-        return (
-          <Marker
-            key={place.id}
-            position={[place.lat, place.lng]}
-            icon={createPinIcon(place, isSelected)}
-            title={place.name}
-            riseOnHover
-            zIndexOffset={isSelected ? 1000 : 0}
-            eventHandlers={{ click: () => onSelectPlace(place.id) }}
-          />
-        )
-      })}
+      {places.map((place) => (
+        <PlaceMarker
+          key={place.id}
+          place={place}
+          isSelected={selectedPlace?.id === place.id}
+          onSelect={onSelectPlace}
+        />
+      ))}
 
       {/* After the markers, so it measures them once they are rendered. */}
       <LabelCollisionHandler trigger={labelTrigger} />
